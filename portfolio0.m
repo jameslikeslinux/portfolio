@@ -1,4 +1,4 @@
-function [stddevs,annrets] = portfolio1()
+function [stddevs,annrets] = portfolio0()
 
 % Wilshire 5000
 % 1971-2010
@@ -80,58 +80,41 @@ stddevs4=[];
 annrets4=[];
 
 for i=0:10:100
-    rets=(reacompidx*(100-i) + eqrets*i)./100;
+    rets=(w5000rets*(100-i) + eaferets*i)./100;
     [ret,risk]=annret(rets);
     stddevs=[stddevs risk];
     annrets=[annrets ret];
 end
 
-recentreacompidx=reacompidx(19:end);
-[a,b]=correct(trea,recentreacompidx);
-
-% See how good of a correction we got
-%recentreacompidx=a*recentreacompidx+b;
-%sqrt(mean((recentreacompidx-trea).^2))
-%[recentreacompidx; trea]
-%cor(recentreacompidx, trea)
+part=17;
 
 for i=0:10:100
-    rets=(recentreacompidx*(100-i) + eqrets(19:end)*i)./100;
-    [ret,risk]=annret(rets);
-    stddevs3=[stddevs3 risk];
-    annrets3=[annrets3 ret];
-end
-
-reacompidx=a*reacompidx+b;
-
-for i=0:10:100
-    rets=(reacompidx*(100-i) + eqrets*i)./100;
-    [ret,risk]=annret(rets);
-    stddevs4=[stddevs4 risk];
-    annrets4=[annrets4 ret];
-end
-
-eqrets=eqrets(19:end);
-for i=0:10:100
-    rets=(trea*(100-i) + eqrets*i)./100;
+    rets=(w5000rets(1:part)*(100-i) + eaferets(1:part)*i)./100;
     [ret,risk]=annret(rets);
     stddevs2=[stddevs2 risk];
     annrets2=[annrets2 ret];
 end
 
+for i=0:10:100
+    rets=(w5000rets(part:end)*(100-i) + eaferets(part:end)*i)./100;
+    [ret,risk]=annret(rets);
+    stddevs3=[stddevs3 risk];
+    annrets3=[annrets3 ret];
+end
+
 %plot(stddevs, annrets, '-x');
 %plot(stddevs, annrets, '-x', stddevs2, annrets2, '-x');
-%plot(stddevs, annrets, '-x', stddevs2, annrets2, '-x', stddevs3, annrets3, '-x');
-plot(stddevs, annrets, '-x', stddevs2, annrets2, '-x', stddevs3, annrets3, '-x', stddevs4, annrets4, '-x');
+plot(stddevs, annrets, '-x', stddevs2, annrets2, '-x', stddevs3, annrets3, '-x');
+%plot(stddevs, annrets, '-x', stddevs2, annrets2, '-x', stddevs3, annrets3, '-x', stddevs4, annrets4, '-x');
 xlabel('Standard Deviation');
 ylabel('Annualized Returns');
-title('Real Estate and Equities Allocations for 1978-2010');
-text(stddevs(1), annrets(1), 'REA Comp 1978-');
-text(stddevs2(1), annrets2(1), 'TREA 1996-');
-text(stddevs3(1), annrets3(1), 'REA Comp 1996-');
-text(stddevs4(1), annrets4(1), 'Extrapolated TREA 1978-');
-text(stddevs(end), annrets(end), 'Equities 1978-');
-text(stddevs2(end), annrets2(end), 'Equities 1996-');
+title('Domestic and International Equities Allocations for 1971-2010');
+text(stddevs(1), annrets(1), 'Domestic 1971-2010');
+text(stddevs2(1), annrets2(1), 'Domestic 1971-1988');
+text(stddevs3(1), annrets3(1), 'Domestic 1988-2010');
+text(stddevs(end), annrets(end), 'International 1971-2010');
+text(stddevs2(end), annrets2(end), 'International 1971-1988');
+text(stddevs3(end), annrets3(end), 'International 1988-2010');
 
 function [a,b] = correct(real, projected)
 [realret,realrisk]=annret(real);

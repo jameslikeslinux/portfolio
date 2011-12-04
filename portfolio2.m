@@ -1,4 +1,4 @@
-function [stddevs,annrets] = portfolio1()
+function [stddevs,annrets] = portfolio2()
 
 % Wilshire 5000
 % 1971-2010
@@ -67,6 +67,33 @@ ncreif=ncreif-1.01;
 trea=[8.33 10.07 8.07 8.17 10.65 6.29 3.41 7.43 12.54 14.03 13.88 13.76 -14.14 -27.67 13.20];
 trea=trea-1.01; % Subtract expenses for TREA
 
+% Extrapolated TREA
+% 1978-2010
+[a,b]=correct(trea,reacompidx(19:end));
+trealong=a*reacompidx+b;
+
+% High Risk
+% 1978-2010
+hrlong=eqrets*0.8+trealong*0.2;
+
+% High Risk
+% 1996-2010
+hrshort=eqrets(19:end)*0.8+trea*0.2;
+
+% Barclays Capital US Aggregate Bond Index
+% 1976-2010
+% Source: http://www.bogleheads.org/wiki/Barclays_Capital_US_Aggregate_Bond_Index
+bcbondidx=[15.60 3.00 1.40 1.90 2.70 6.30 32.60 8.40 15.15 22.11 15.26 2.76 7.89 14.53 8.96 16.00 7.40 9.75 -2.92 18.47 3.63 9.65 8.69 -0.82 11.63 8.44 10.26 4.10 4.34 2.43 4.33 6.97 5.24 5.93 6.54];
+bcbondidx=bcbondidx-0.28; % Subtract expenses for TBIPX
+
+% Barclays Capital US Aggregate Bond Index
+% 1978-2010
+bcbondidx=bcbondidx(3:end);
+
+% Barclays Capital US Aggregate Bond Index
+% 1996-2010
+bcbondidxshort=bcbondidx(19:end);
+
 stddevs=[];
 annrets=[];
 
@@ -80,58 +107,30 @@ stddevs4=[];
 annrets4=[];
 
 for i=0:10:100
-    rets=(reacompidx*(100-i) + eqrets*i)./100;
+    rets=(bcbondidx*(100-i) + hrlong*i)./100;
     [ret,risk]=annret(rets);
     stddevs=[stddevs risk];
     annrets=[annrets ret];
 end
 
-recentreacompidx=reacompidx(19:end);
-[a,b]=correct(trea,recentreacompidx);
-
-% See how good of a correction we got
-%recentreacompidx=a*recentreacompidx+b;
-%sqrt(mean((recentreacompidx-trea).^2))
-%[recentreacompidx; trea]
-%cor(recentreacompidx, trea)
-
 for i=0:10:100
-    rets=(recentreacompidx*(100-i) + eqrets(19:end)*i)./100;
-    [ret,risk]=annret(rets);
-    stddevs3=[stddevs3 risk];
-    annrets3=[annrets3 ret];
-end
-
-reacompidx=a*reacompidx+b;
-
-for i=0:10:100
-    rets=(reacompidx*(100-i) + eqrets*i)./100;
-    [ret,risk]=annret(rets);
-    stddevs4=[stddevs4 risk];
-    annrets4=[annrets4 ret];
-end
-
-eqrets=eqrets(19:end);
-for i=0:10:100
-    rets=(trea*(100-i) + eqrets*i)./100;
+    rets=(bcbondidxshort*(100-i) + hrshort*i)./100;
     [ret,risk]=annret(rets);
     stddevs2=[stddevs2 risk];
     annrets2=[annrets2 ret];
 end
 
 %plot(stddevs, annrets, '-x');
-%plot(stddevs, annrets, '-x', stddevs2, annrets2, '-x');
+plot(stddevs, annrets, '-x', stddevs2, annrets2, '-x');
 %plot(stddevs, annrets, '-x', stddevs2, annrets2, '-x', stddevs3, annrets3, '-x');
-plot(stddevs, annrets, '-x', stddevs2, annrets2, '-x', stddevs3, annrets3, '-x', stddevs4, annrets4, '-x');
+%plot(stddevs, annrets, '-x', stddevs2, annrets2, '-x', stddevs3, annrets3, '-x', stddevs4, annrets4, '-x');
 xlabel('Standard Deviation');
 ylabel('Annualized Returns');
-title('Real Estate and Equities Allocations for 1978-2010');
-text(stddevs(1), annrets(1), 'REA Comp 1978-');
-text(stddevs2(1), annrets2(1), 'TREA 1996-');
-text(stddevs3(1), annrets3(1), 'REA Comp 1996-');
-text(stddevs4(1), annrets4(1), 'Extrapolated TREA 1978-');
-text(stddevs(end), annrets(end), 'Equities 1978-');
-text(stddevs2(end), annrets2(end), 'Equities 1996-');
+title('High Risk and Bond Fund Allocations for 1978-2010');
+text(stddevs(1), annrets(1), 'Bond Fund 1978-');
+text(stddevs2(1), annrets2(1), 'Bond Fund 1996-');
+text(stddevs(end), annrets(end), 'High Risk 1978-');
+text(stddevs2(end), annrets2(end), 'High Risk 1996-');
 
 function [a,b] = correct(real, projected)
 [realret,realrisk]=annret(real);
