@@ -74,11 +74,11 @@ trealong=a*reacompidx+b;
 
 % High Risk
 % 1978-2010
-hrlong=eqrets*0.8+trealong*0.2;
+hrlong=eqrets*0.9+trealong*0.1;
 
 % High Risk
 % 1996-2010
-hrshort=eqrets(19:end)*0.8+trea*0.2;
+hrshort=eqrets(19:end)*0.9+trea*0.1;
 
 % Barclays Capital US Aggregate Bond Index
 % 1976-2010
